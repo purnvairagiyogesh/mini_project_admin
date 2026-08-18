@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: const Color(0xFF12141C), // Slightly lighter than pure black
           ),
           themeMode: currentMode,
-          home: const HomePage(),
+          home: const adminLogin(),
         );
       },
     );
