@@ -30,7 +30,6 @@ class _adminLoginState extends State<adminLogin> {
     bool isLoggedIn = sp.getBool("login") ?? false;
     if (isLoggedIn) {
       if (mounted) {
-        // Use post-frame callback to ensure context is ready for navigation
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.pushReplacement(
             context,
@@ -43,6 +42,7 @@ class _adminLoginState extends State<adminLogin> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -50,154 +50,242 @@ class _adminLoginState extends State<adminLogin> {
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              primaryColor.withOpacity(0.8),
-              primaryColor,
-              primaryColor.withBlue(200),
-            ],
-          ),
+          color: isDark ? const Color(0xFF0F1219) : Colors.white,
         ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.admin_panel_settings_rounded,
-                      size: 80,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Welcome Back",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const Text(
-                    "Sign in to continue as Admin",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  const SizedBox(height: 40),
-                  Container(
-                    padding: const EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(35),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 40,
-                          offset: const Offset(0, 20),
+        child: Stack(
+          children: [
+            // Background Decorative Elements
+            Positioned(
+              top: -100,
+              right: -50,
+              child: _circularShape(250, primaryColor.withOpacity(0.1)),
+            ),
+            Positioned(
+              bottom: -50,
+              left: -80,
+              child: _circularShape(300, Colors.indigo.withOpacity(0.05)),
+            ),
+            
+            // Main Content
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo / Header Section
+                      Hero(
+                        tag: 'admin_icon',
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: primaryColor.withOpacity(0.2), width: 2),
+                          ),
+                          child: Icon(
+                            Icons.admin_panel_settings_rounded,
+                            size: 70,
+                            color: primaryColor,
+                          ),
                         ),
-                      ],
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Email Address",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: emailController,
-                            decoration: _inputDecoration(
-                              hint: "admin@example.com",
-                              icon: Icons.email_outlined,
-                            ),
-                            validator: (value) => value!.isEmpty ? "Enter your email" : null,
-                          ),
-                          const SizedBox(height: 25),
-                          const Text(
-                            "Password",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: passwordController,
-                            obscureText: !_isPasswordVisible,
-                            decoration: _inputDecoration(
-                              hint: "••••••••",
-                              icon: Icons.lock_outline_rounded,
-                              isPassword: true,
-                            ),
-                            validator: (value) => value!.isEmpty ? "Enter your password" : null,
-                          ),
-                          const SizedBox(height: 40),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : () {
-                                if (_formKey.currentState!.validate()) {
-                                  signin(emailController.text, passwordController.text);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                elevation: 8,
-                              ),
-                              child: _isLoading 
-                                ? const CircularProgressIndicator(color: Colors.white)
-                                : const Text(
-                                    "LOGIN",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2),
-                                  ),
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
+                      const SizedBox(height: 25),
+                      Text(
+                        "Administrator",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : Colors.indigo.shade900,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      Text(
+                        "Control Center Access",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade500,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 45),
+                      
+                      // Login Form Card
+                      Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1C212D) : Colors.white,
+                          borderRadius: BorderRadius.circular(35),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(isDark ? 0.2 : 0.1),
+                              blurRadius: 30,
+                              offset: const Offset(0, 15),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _label("Email Address"),
+                              const SizedBox(height: 10),
+                              _buildTextField(
+                                controller: emailController,
+                                hint: "admin@example.com",
+                                icon: Icons.alternate_email_rounded,
+                                isDark: isDark,
+                                primaryColor: primaryColor,
+                              ),
+                              const SizedBox(height: 25),
+                              _label("Access Token / Password"),
+                              const SizedBox(height: 10),
+                              _buildTextField(
+                                controller: passwordController,
+                                hint: "••••••••",
+                                icon: Icons.lock_open_rounded,
+                                isDark: isDark,
+                                primaryColor: primaryColor,
+                                isPassword: true,
+                              ),
+                              const SizedBox(height: 40),
+                              
+                              // Login Button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading ? null : () {
+                                    if (_formKey.currentState!.validate()) {
+                                      signin(emailController.text, passwordController.text);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    elevation: 10,
+                                    shadowColor: primaryColor.withOpacity(0.5),
+                                  ),
+                                  child: _isLoading 
+                                    ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 3)
+                                    : const Text(
+                                        "AUTHENTICATE",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 2,
+                                        ),
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "System Recovery Support",
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration({required String hint, required IconData icon, bool isPassword = false}) {
-    return InputDecoration(
-      hintText: hint,
-      prefixIcon: Icon(icon, color: Colors.grey),
-      suffixIcon: isPassword
-          ? IconButton(
-              icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
-              onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-            )
-          : null,
-      filled: true,
-      fillColor: Colors.grey.withOpacity(0.05),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5), width: 1.5),
+  Widget _circularShape(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, color.withOpacity(0)],
+        ),
       ),
+    );
+  }
+
+  Widget _label(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: Colors.grey,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required bool isDark,
+    required Color primaryColor,
+    bool isPassword = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: isPassword && !_isPasswordVisible,
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: isDark ? Colors.white : Colors.black87,
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.normal),
+        prefixIcon: Icon(icon, color: primaryColor.withOpacity(0.7), size: 20),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+              )
+            : null,
+        filled: true,
+        fillColor: isDark ? Colors.white.withOpacity(0.03) : Colors.grey.withOpacity(0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      ),
+      validator: (value) => value!.isEmpty ? "Input required" : null,
     );
   }
 
@@ -221,8 +309,11 @@ class _adminLoginState extends State<adminLogin> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Invalid credentials or you are not an Admin"), 
-              backgroundColor: Colors.redAccent
+              content: Text("Access Denied: Invalid Admin Credentials"), 
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
             )
           );
         }
@@ -248,8 +339,11 @@ class _adminLoginState extends State<adminLogin> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Server error: $responseBody"), 
-              backgroundColor: Colors.redAccent
+              content: Text("System Conflict: $responseBody"), 
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(20),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
             )
           );
         }
@@ -258,8 +352,11 @@ class _adminLoginState extends State<adminLogin> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Connection failed: Check your internet"),
-            backgroundColor: Colors.orangeAccent
+            content: Text("Connection Integrity Failure"), 
+            backgroundColor: Colors.orangeAccent,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
           )
         );
       }

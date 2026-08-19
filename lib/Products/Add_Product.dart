@@ -19,6 +19,7 @@ class _Add_ProductState extends State<Add_Product> {
   final _pDiscountController = TextEditingController();
   final _pFeaturesController = TextEditingController();
   final _pRatingController = TextEditingController();
+  final _pQuantityController = TextEditingController();
   
   File? _image;
   final picker = ImagePicker();
@@ -131,6 +132,8 @@ class _Add_ProductState extends State<Add_Product> {
                     const SizedBox(height: 18),
                     _buildInputField(_pRatingController, "Initial Rating (1-5)", Icons.star_outline_rounded, isDark, type: TextInputType.number),
                     const SizedBox(height: 18),
+                    _buildInputField(_pQuantityController, "Stock Quantity", Icons.inventory_2_outlined, isDark, type: TextInputType.number),
+                    const SizedBox(height: 18),
                     _buildInputField(_pFeaturesController, "Description & Features", Icons.description_outlined, isDark, lines: 4),
                   ],
                 ),
@@ -197,6 +200,7 @@ class _Add_ProductState extends State<Add_Product> {
         ..fields['product_price'] = _pPriceController.text.trim()
         ..fields['final_discounted_price'] = _pDiscountController.text.trim()
         ..fields['ratings'] = _pRatingController.text.trim()
+        ..fields['quantity'] = _pQuantityController.text.trim()
         ..fields['features'] = _pFeaturesController.text.trim()
         ..files.add(await http.MultipartFile.fromPath('product_image', _image!.path));
 

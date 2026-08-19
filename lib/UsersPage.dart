@@ -101,7 +101,7 @@ class _UsersPageState extends State<UsersPage> {
                 color: Colors.purpleAccent,
                 cardColor: cardColor,
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const manageUser()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const manageUser(isReadOnly: true)));
                 },
               ),
               const SizedBox(height: 25),

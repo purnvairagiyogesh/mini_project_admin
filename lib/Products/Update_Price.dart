@@ -82,7 +82,13 @@ class _Update_PriceState extends State<Update_Price> {
                         Text(widget.product['product_name'] ?? "Product", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 5),
                         Text("Current MRP: ₹${widget.product['product_price']}", style: const TextStyle(color: Colors.grey, decoration: TextDecoration.lineThrough)),
-                        Text("Rating: ${widget.product['ratings']}", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                        Row(
+                          children: [
+                            Text("Rating: ${widget.product['ratings']}", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 15),
+                            Text("Qty: ${widget.product['product_quantity'] ?? '0'}", style: const TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ],
                     ),
                   ),

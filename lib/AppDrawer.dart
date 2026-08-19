@@ -89,8 +89,11 @@ class AppDrawer extends StatelessWidget {
                   Switch(
                     value: isDark,
                     activeColor: primaryColor,
-                    onChanged: (val) {
+                    onChanged: (val) async {
                       themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
+                      // Persist theme choice
+                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('isDarkMode', val);
                     },
                   ),
                 ],
@@ -100,14 +103,20 @@ class AppDrawer extends StatelessWidget {
           const Spacer(),
           ListTile(
             leading: Icon(Icons.logout_rounded, color: Colors.redAccent),
-            title: Text("Logout Session", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            title: const Text("Logout Session", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
             onTap: () async {
               SharedPreferences sp = await SharedPreferences.getInstance();
+              // Do not use sp.clear() as it wipes theme preferences
+              // Only remove login-specific keys
               await sp.remove('email');
-              await sp.setBool('login', false);
-              await sp.clear();
+              await sp.remove('login');
+              
               if (context.mounted) {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => adminLogin()),);
+                Navigator.pushAndRemoveUntil(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const adminLogin()),
+                  (route) => false
+                );
               }
             },
           ),

@@ -21,6 +21,7 @@ class PModel extends StatefulWidget {
 
 class _PModelState extends State<PModel> {
   final Set<int> _expandedItems = {};
+  final Set<int> _showPriceItems = {};
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +37,7 @@ class _PModelState extends State<PModel> {
         itemBuilder: (context, index) {
           final item = widget.list[index];
           final isExpanded = _expandedItems.contains(index);
+          final isPriceVisible = _showPriceItems.contains(index);
 
           return AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -55,101 +57,87 @@ class _PModelState extends State<PModel> {
               borderRadius: BorderRadius.circular(28),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Image Section
-                        Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              item['product_image'] ?? "",
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Details Section
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item["product_name"] ?? "Unknown",
-                                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (isExpanded) _expandedItems.remove(index);
+                          else _expandedItems.add(index);
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Image Section with Full View
+                            GestureDetector(
+                              onTap: () => _showFullScreenImage(context, item['product_image'] ?? ""),
+                              child: Container(
+                                height: 100,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    item['product_image'] ?? "",
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                                  ),
+                                ),
                               ),
-                              const SizedBox(height: 6),
-                              Row(
+                            ),
+                            const SizedBox(width: 16),
+                            // Details Section
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.star_rounded, size: 18, color: Colors.amber.shade700),
-                                  const SizedBox(width: 4),
-                                  Text("${item['ratings'] ?? '0.0'}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  Text(
+                                    item["product_name"] ?? "Unknown",
+                                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.star_rounded, size: 18, color: Colors.amber.shade700),
+                                      const SizedBox(width: 4),
+                                      Text("${item['ratings'] ?? '0.0'}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 12),
+                                      Icon(Icons.inventory_2_outlined, size: 16, color: Colors.grey.shade600),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "Qty: ${item['quantity'] ?? item['product_quantity'] ?? '0'}",
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Price: ₹${item['product_price']}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "MRP: ₹${item['product_price']}",
-                                style: TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey.shade600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (isExpanded) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  "Deal Price: ₹${item['final_discount_price'] ?? item['final_discounted_price']}",
-                                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.w900, fontSize: 16),
-                                ),
-                              ]
-                            ],
-                          ),
-                        ),
-                        // Actions Column
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (isExpanded) _expandedItems.remove(index);
-                                  else _expandedItems.add(index);
-                                });
-                              },
-                              icon: Icon(
-                                isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-                                color: primaryColor,
-                              ),
                             ),
-                            if (!widget.isReadOnly) ...[
-                              IconButton(
-                                onPressed: () => _navigateToEdit(context, item),
-                                icon: const Icon(Icons.edit_note_rounded, color: Colors.blue),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => Update_Price(product: item)),
-                                  ).then((_) => widget.onRefresh());
-                                },
-                                icon: const Icon(Icons.sell_rounded, color: Colors.green),
-                                tooltip: "Update Discount",
-                              ),
-                            ]
+                            // Expand Icon
+                            Icon(
+                              isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                              color: primaryColor,
+                              size: 28,
+                            ),
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
                   ),
                   if (isExpanded) ...[
@@ -159,6 +147,64 @@ class _PModelState extends State<PModel> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // NEW: Expandable Price Button
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (isPriceVisible) _showPriceItems.remove(index);
+                                else _showPriceItems.add(index);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: primaryColor.withOpacity(0.3)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.local_offer_rounded, size: 18, color: primaryColor),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isPriceVisible ? "Hide Discounted Price" : "View Final Discounted Price",
+                                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Icon(
+                                    isPriceVisible ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+                                    color: primaryColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          
+                          if (isPriceVisible) ...[
+                            const SizedBox(height: 15),
+                            Container(
+                              padding: const EdgeInsets.all(15),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Colors.green.withOpacity(0.2)),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Final Deal Price:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                  Text(
+                                    "₹${item['final_discount_price'] ?? item['final_discounted_price']}",
+                                    style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w900, fontSize: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(height: 20),
                           const Text("Key Features:", style: TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           Text(
@@ -167,18 +213,45 @@ class _PModelState extends State<PModel> {
                           ),
                           if (!widget.isReadOnly) ...[
                             const SizedBox(height: 20),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () => _showDeleteDialog(context, item["product_id"]),
-                                icon: const Icon(Icons.delete_sweep_rounded),
-                                label: const Text("DELETE PRODUCT"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red.withOpacity(0.1),
-                                  foregroundColor: Colors.red,
-                                  elevation: 0,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _navigateToEdit(context, item),
+                                    icon: const Icon(Icons.edit_note_rounded),
+                                    label: const Text("Edit"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue.withOpacity(0.1),
+                                      foregroundColor: Colors.blue,
+                                      elevation: 0,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => Update_Price(product: item)),
+                                      ).then((_) => widget.onRefresh());
+                                    },
+                                    icon: const Icon(Icons.sell_rounded),
+                                    label: const Text("Price"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green.withOpacity(0.1),
+                                      foregroundColor: Colors.green,
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton.filledTonal(
+                                  onPressed: () => _showDeleteDialog(context, item["product_id"]),
+                                  icon: const Icon(Icons.delete_outline_rounded),
+                                  style: IconButton.styleFrom(foregroundColor: Colors.redAccent),
+                                ),
+                              ],
                             )
                           ]
                         ],
@@ -190,6 +263,39 @@ class _PModelState extends State<PModel> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    if (imageUrl.isEmpty) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            iconTheme: const IconThemeData(color: Colors.white),
+            elevation: 0,
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                },
+                errorBuilder: (c, e, s) => const Icon(Icons.broken_image, size: 100, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -206,6 +312,7 @@ class _PModelState extends State<PModel> {
           pfinal_price: (item["final_discount_price"] ?? item["final_discounted_price"]).toString(),
           pfeature: item["features"] ?? "",
           prating: item["ratings"].toString(),
+          pquantity: (item["quantity"] ?? item["product_quantity"] ?? '0').toString(),
         ),
       ),
     ).then((value) {

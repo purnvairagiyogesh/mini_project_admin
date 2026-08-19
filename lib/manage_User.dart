@@ -8,7 +8,8 @@ import 'AppDrawer.dart';
 import 'AppBottomNavBar.dart';
 
 class manageUser extends StatefulWidget {
-  const manageUser({super.key});
+  final bool isReadOnly;
+  const manageUser({super.key, this.isReadOnly = false});
 
   @override
   State<manageUser> createState() => _manageUserState();
@@ -51,7 +52,8 @@ class _manageUserState extends State<manageUser> {
       drawer: AppDrawer(adminEmail: adminEmail),
       bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
       appBar: AppBar(
-        title: const Text("Manage Users", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(widget.isReadOnly ? "User Registry" : "Manage Users", 
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -89,7 +91,7 @@ class _manageUserState extends State<manageUser> {
             );
           }
           if (snapshot.hasData && (snapshot.data as List).isNotEmpty) {
-            return Model(list: snapshot.data, onRefresh: _refresh);
+            return Model(list: snapshot.data, onRefresh: _refresh, isReadOnly: widget.isReadOnly);
           }
 
           return Center(
@@ -100,13 +102,13 @@ class _manageUserState extends State<manageUser> {
                 const SizedBox(height: 20),
                 const Text("No Users Found", style: TextStyle(fontSize: 20, color: Colors.grey, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
-                const Text("Tap '+' to add your first user", style: TextStyle(color: Colors.grey)),
+                if (!widget.isReadOnly) const Text("Tap '+' to add your first user", style: TextStyle(color: Colors.grey)),
               ],
             ),
           );
         },
       ),
-      floatingActionButton: Padding(
+      floatingActionButton: widget.isReadOnly ? null : Padding(
         padding: const EdgeInsets.only(bottom: 90.0),
         child: FloatingActionButton(
           onPressed: () {

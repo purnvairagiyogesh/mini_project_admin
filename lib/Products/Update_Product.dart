@@ -7,7 +7,7 @@ import '../AppDrawer.dart';
 import '../AppBottomNavBar.dart';
 
 class Update_Product extends StatefulWidget {
-  final String id, pname, pprice, pimage, pfinal_price, pfeature, prating;
+  final String id, pname, pprice, pimage, pfinal_price, pfeature, prating, pquantity;
   const Update_Product({
     super.key,
     required this.id,
@@ -17,6 +17,7 @@ class Update_Product extends StatefulWidget {
     required this.pfinal_price,
     required this.pfeature,
     required this.prating,
+    required this.pquantity,
   });
 
   @override
@@ -24,7 +25,7 @@ class Update_Product extends StatefulWidget {
 }
 
 class _Update_ProductState extends State<Update_Product> {
-  late TextEditingController _pNameController, _pPriceController, _pDiscountController, _pFeaturesController, _pRatingController;
+  late TextEditingController _pNameController, _pPriceController, _pDiscountController, _pFeaturesController, _pRatingController, _pQuantityController;
   
   File? _image;
   final picker = ImagePicker();
@@ -40,6 +41,7 @@ class _Update_ProductState extends State<Update_Product> {
     _pDiscountController = TextEditingController(text: widget.pfinal_price);
     _pFeaturesController = TextEditingController(text: widget.pfeature);
     _pRatingController = TextEditingController(text: widget.prating);
+    _pQuantityController = TextEditingController(text: widget.pquantity);
     _loadAdminData();
   }
 
@@ -149,6 +151,8 @@ class _Update_ProductState extends State<Update_Product> {
                     const SizedBox(height: 18),
                     _buildInputField(_pRatingController, "Initial Rating (1-5)", Icons.star_outline_rounded, isDark, type: TextInputType.number),
                     const SizedBox(height: 18),
+                    _buildInputField(_pQuantityController, "Stock Quantity", Icons.inventory_2_outlined, isDark, type: TextInputType.number),
+                    const SizedBox(height: 18),
                     _buildInputField(_pFeaturesController, "Description & Features", Icons.description_outlined, isDark, lines: 4),
                   ],
                 ),
@@ -212,6 +216,7 @@ class _Update_ProductState extends State<Update_Product> {
         ..fields['product_price'] = _pPriceController.text.trim()
         ..fields['final_discounted_price'] = _pDiscountController.text.trim()
         ..fields['ratings'] = _pRatingController.text.trim()
+        ..fields['quantity'] = _pQuantityController.text.trim()
         ..fields['features'] = _pFeaturesController.text.trim();
 
       if (_image != null) {

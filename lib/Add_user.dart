@@ -232,8 +232,8 @@ class _Add_UserState extends State<Add_User> {
         ..fields['email'] = userEmailController.text.trim()
         ..fields['phone'] = userPhoneController.text.trim()
         ..fields['password'] = userPasswordController.text.trim()
-        ..files.add(await http.MultipartFile.fromPath('user_image', _userImage!.path))
-        ..files.add(await http.MultipartFile.fromPath('adhar_image', _adharImage!.path));
+        ..files.add(await http.MultipartFile.fromPath('user_photo', _userImage!.path))
+        ..files.add(await http.MultipartFile.fromPath('user_adharcard', _adharImage!.path));
 
       var response = await request.send();
       var responseData = await response.stream.bytesToString();

@@ -239,10 +239,10 @@ class _Update_UserState extends State<Update_User> {
         ..fields['password'] = passController.text.trim();
 
       if (_newUserImage != null) {
-        request.files.add(await http.MultipartFile.fromPath('user_image', _newUserImage!.path));
+        request.files.add(await http.MultipartFile.fromPath('user_photo', _newUserImage!.path));
       }
       if (_newAdharImage != null) {
-        request.files.add(await http.MultipartFile.fromPath('adhar_image', _newAdharImage!.path));
+        request.files.add(await http.MultipartFile.fromPath('user_adharcard', _newAdharImage!.path));
       }
 
       var response = await request.send();

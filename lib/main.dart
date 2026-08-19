@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'HomePage.dart';
 import 'adminLogin.dart';
 
 // Global notifier for theme management
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load saved theme preference
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final bool isDark = prefs.getBool('isDarkMode') ?? false;
+  themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
+  
   runApp(const MyApp());
 }
 
@@ -34,7 +41,7 @@ class MyApp extends StatelessWidget {
               seedColor: Colors.indigoAccent,
               brightness: Brightness.dark,
             ),
-            scaffoldBackgroundColor: const Color(0xFF12141C), // Slightly lighter than pure black
+            scaffoldBackgroundColor: const Color(0xFF12141C),
           ),
           themeMode: currentMode,
           home: const adminLogin(),
